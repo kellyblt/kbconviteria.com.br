@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daniely &amp; Marcos Paulo | Pix</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Georgia,'Times New Roman',serif;color:#4c453d}
+body{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:28px 16px; background:url('fundo.png') center/cover fixed no-repeat;
+}
+.card{
+  width:min(92vw,520px); text-align:center; padding:34px 28px;
+  background:rgba(255,253,248,.88); border:1px solid rgba(145,128,105,.25);
+  border-radius:24px; box-shadow:0 16px 45px rgba(80,65,45,.16);
+  backdrop-filter:blur(5px);
+}
+h2{font-size:clamp(28px,7vw,42px);font-weight:500;margin:0 0 18px;color:#665a4c}
+p{font-family:Arial,sans-serif;font-size:16px;line-height:1.65;margin:0 auto 24px;max-width:430px}
+.qr{width:min(245px,70vw);height:auto;background:white;padding:12px;border-radius:16px;
+box-shadow:0 6px 20px rgba(0,0,0,.10);margin-bottom:22px}
+button{border:0;border-radius:999px;padding:15px 25px;background:#766958;color:#fff;
+font-size:16px;font-weight:700;cursor:pointer;transition:.2s}
+button:hover{transform:translateY(-1px);filter:brightness(.95)}
+#status{min-height:22px;margin:12px 0 0;font:14px Arial,sans-serif;color:#665a4c}
+</style>
+</head>
+<body>
+<main class="card">
+  <h2>Daniely &amp; Marcos Paulo</h2>
+  <p>Dê o seu ‘sim’ para nós também! Confirme sua presença no casamento de Daniely e Marcos Paulo, por favor, até o dia 22/08/2026 e venha celebrar o amor conosco.</p>
+  <img class="qr" src="qrcode_pix.png" alt="QR Code Pix">
+  <br>
+  <button type="button" onclick="copiarPix()">Copiar código Pix</button>
+  <div id="status" aria-live="polite"></div>
+</main>
+<script>
+const codigoPix = '00020126330014br.gov.bcb.pix0111058520921935204000053039865802BR5901N6001C62070503***6304681E';
+async function copiarPix(){
+  const status = document.getElementById('status');
+  try {
+    await navigator.clipboard.writeText(codigoPix);
+    status.textContent='Código Pix copiado!';
+  } catch(e) {
+    const t=document.createElement('textarea'); t.value=codigoPix;
+    t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t);
+    t.select(); document.execCommand('copy'); t.remove();
+    status.textContent='Código Pix copiado!';
+  }
+}
+</script>
+</body>
+</html>
