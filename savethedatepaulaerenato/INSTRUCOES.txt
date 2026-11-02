@@ -1,0 +1,1 @@
+Publique o conteúdo deste ZIP na Netlify. Para trocar a capa, substitua o arquivo correspondente na pasta assets, mantendo o mesmo nome. Republique a pasta completa no mesmo site. Para outras alterações, gere um novo ZIP neste formulário.
