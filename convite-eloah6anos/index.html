@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convite aniversário Eloah 6 anos</title>
+<meta name="description" content="Você está convidado! Toque para abrir o convite.">
+<meta property="og:title" content="Convite aniversário Eloah 6 anos">
+<meta property="og:description" content="Você está convidado! Toque para abrir o convite.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Convite aniversário Eloah 6 anos">
+<meta name="twitter:description" content="Você está convidado! Toque para abrir o convite.">
+<meta property="og:url" content="https://convite-eloah6anos-kbconviteria.netlify.app">
+<link rel="canonical" href="https://convite-eloah6anos-kbconviteria.netlify.app">
+<meta property="og:image" content="https://convite-eloah6anos-kbconviteria.netlify.app/preview.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://convite-eloah6anos-kbconviteria.netlify.app/preview.jpg">
+<style>html,body{margin:0;padding:0;background:#ffffff}</style>
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+</head>
+<body>
+<!-- ========= CONTAINER 1: RASPADINHA ========= -->
+<style>
+  html,body{margin:0!important;padding:0!important;background:#000!important;width:100%;height:100%;overflow:hidden!important;touch-action:none}
+  #rasp-capa{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;background:#000;z-index:20;opacity:1;transition:opacity 1.2s ease-in-out}
+  #rasp-capa.saindo{opacity:0;pointer-events:none}
+  @supports(height:100svh){#rasp-capa{height:100svh}}
+  @supports(height:100dvh){#rasp-capa{height:100dvh}}
+  #rasp-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100vw;height:calc(100vw * 1850 / 1080);background:#000}
+  @media(max-aspect-ratio:1080/1850){#rasp-stage{width:calc(100vh * 1080 / 1850);height:100vh}@supports(height:100svh){#rasp-stage{width:calc(100svh * 1080 / 1850);height:100svh}}@supports(height:100dvh){#rasp-stage{width:calc(100dvh * 1080 / 1850);height:100dvh}}}
+  @media(min-aspect-ratio:1080/1850){#rasp-stage{width:100vw;height:calc(100vw * 1850 / 1080)}}
+  #rasp-imgFundo{position:absolute;inset:0;display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;pointer-events:none;user-select:none;-webkit-user-drag:none;visibility:hidden}
+  #rasp-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+  #rasp-floco-wrap{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-20px);display:none;flex-direction:column;align-items:center;gap:6px}
+  #rasp-borracha{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill;pointer-events:none;user-select:none;-webkit-user-drag:none;z-index:25;will-change:transform}
+  #rasp-floco-texto{font-family:Arial,sans-serif;font-size:clamp(9px,2.2vw,13px);color:#374151;text-align:center;max-width:min(78vw,360px);line-height:1.4;background:rgba(255,255,255,.92);padding:6px 14px;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,.18);opacity:1;transition:opacity .4s ease}
+  #rasp-floco-texto.sumido{opacity:0}
+  #rasp-hint:empty{display:none}
+  #rasp-hint{position:absolute;bottom:8%;left:50%;transform:translateX(-50%);z-index:30;background:rgba(0,0,0,.55);color:#fff;font-family:Arial,sans-serif;font-size:clamp(12px,3vw,16px);padding:10px 24px;border-radius:30px;white-space:nowrap;pointer-events:none;opacity:1;transition:opacity .5s ease}
+  #rasp-capa img,#rasp-capa video{-webkit-user-drag:none;-webkit-touch-callout:none;user-select:none}
+  .elementor-section,.elementor-container,.elementor-widget-wrap{margin:0!important;padding:0!important}
+</style>
+<div id="rasp-capa"><div id="rasp-stage">
+  <img id="rasp-imgFundo" src="assets/imagem-fundo-1-Convite-Salvar-Colagem-criada-por-taciana-ml-5-.png" alt="Convite" />
+  <canvas id="rasp-canvas"></canvas>
+  <div id="rasp-hint"></div>
+</div></div>
+<div id="rasp-floco-wrap"></div>
+<script>
+(function(){
+  "use strict";
+  var PELICULA_URL="assets/imagem-pelicula-1-Convite-Salvar-Colagem-criada-por-taciana-ml-4-.png",PINCEL_RAIO=55,LIMITE_PERC=75,TIMER_MS=5000;
+  var capa=document.getElementById("rasp-capa"),canvas=document.getElementById("rasp-canvas"),fundo=document.getElementById("rasp-imgFundo"),hint=document.getElementById("rasp-hint"),floco=document.getElementById("rasp-floco-wrap"),flocoTexto=document.getElementById("rasp-floco-texto");
+  if(!capa||!canvas||!fundo)return;
+  var W=1080,H=1850;canvas.width=W;canvas.height=H;var ctx=canvas.getContext("2d");if(!ctx)return;
+  var desenhando=false,ultimoX=0,ultimoY=0,disparado=false,peliculaOk=false,hintEscondido=false,timerIniciado=false,textoSumido=false;
+  var CELL=55,COLS=Math.ceil(W/CELL),ROWS=Math.ceil(H/CELL),celulas=new Uint8Array(COLS*ROWS),totalCelulas=COLS*ROWS;
+  var borr=document.getElementById("rasp-borracha"),bx0=null,by0=null,bdx=0,bdy=0;
+  function moverFloco(x,y){if(floco){floco.style.left=x+"px";floco.style.top=y+"px"}if(borr&&desenhando){if(bx0===null){bx0=x-bdx;by0=y-bdy}bdx=x-bx0;bdy=y-by0;borr.style.transform="translate("+bdx+"px,"+bdy+"px)"}}
+  function soltarBorr(){bx0=null;by0=null}
+  moverFloco(innerWidth/2,innerHeight/2);if(floco)floco.style.display="flex";
+  function esconderTexto(){if(textoSumido||!flocoTexto)return;textoSumido=true;flocoTexto.classList.add("sumido")}
+  function marcar(cx,cy,raio){var r=raio+CELL/2,cMin=Math.max(0,Math.floor((cx-r)/CELL)),cMax=Math.min(COLS-1,Math.floor((cx+r)/CELL)),rMin=Math.max(0,Math.floor((cy-r)/CELL)),rMax=Math.min(ROWS-1,Math.floor((cy+r)/CELL));for(var row=rMin;row<=rMax;row++){for(var col=cMin;col<=cMax;col++){var idx=row*COLS+col;if(!celulas[idx]){var dx=col*CELL+CELL/2-cx,dy=row*CELL+CELL/2-cy;if(dx*dx+dy*dy<=r*r)celulas[idx]=1}}}}
+  function porcentagem(){var n=0;for(var i=0;i<totalCelulas;i++)if(celulas[i])n++;return n/totalCelulas*100}
+  function revelarFundo(){fundo.style.visibility="visible"}
+  var imgPelicula=new Image();
+  imgPelicula.onload=function(){ctx.clearRect(0,0,W,H);ctx.drawImage(imgPelicula,0,0,W,H);peliculaOk=true;revelarFundo()};
+  imgPelicula.onerror=function(){ctx.fillStyle="rgba(210,210,210,.92)";ctx.fillRect(0,0,W,H);peliculaOk=true;revelarFundo()};
+  imgPelicula.src=PELICULA_URL;
+  function toCanvas(cx,cy){var r=canvas.getBoundingClientRect();return{x:(cx-r.left)*(W/r.width),y:(cy-r.top)*(H/r.height)}}
+  function checar(){if(!disparado&&porcentagem()>=LIMITE_PERC)disparar()}
+  function rasparPonto(x,y){ctx.globalCompositeOperation="destination-out";var grad=ctx.createRadialGradient(x,y,0,x,y,PINCEL_RAIO);grad.addColorStop(0,"rgba(0,0,0,1)");grad.addColorStop(.7,"rgba(0,0,0,.9)");grad.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,PINCEL_RAIO,0,Math.PI*2);ctx.fill();ctx.globalCompositeOperation="source-over";marcar(x,y,PINCEL_RAIO);checar()}
+  function rasparLinha(x1,y1,x2,y2){ctx.globalCompositeOperation="destination-out";ctx.lineWidth=PINCEL_RAIO*2;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="rgba(0,0,0,1)";ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.globalCompositeOperation="source-over";var dx=x2-x1,dy=y2-y1,d=Math.sqrt(dx*dx+dy*dy),steps=Math.max(1,Math.floor(d/(CELL/2)));for(var i=0;i<=steps;i++)marcar(x1+dx*(i/steps),y1+dy*(i/steps),PINCEL_RAIO);checar()}
+  /* Sob a película fica a CAPA, nunca o vídeo. No 1º toque o vídeo é só pré-ligado
+     dentro do gesto (autoriza o som) e volta ao 0, pausado e escondido. */
+  function preIniciarVideo(){if(disparado)return;if(typeof window.__C2_PREPARAR_VIDEO__==="function"){try{window.__C2_PREPARAR_VIDEO__()}catch(_){}}}
+  /* Quando a película some (75% ou timer), a capa inteira some num fade suave;
+     o vídeo começa só depois, pelo handshake com o Container 2. */
+  function disparar(){
+    if(disparado)return;disparado=true;desenhando=false;
+    if(typeof window.__confeteDourado__==="function"){try{window.__confeteDourado__()}catch(_){}}
+    if(borr)borr.style.display="none";
+    if(floco)floco.style.display="none";
+    if(hint)hint.style.opacity="0";
+    capa.classList.add("saindo");
+    var esconder=function(){capa.style.display="none"};
+    capa.addEventListener("transitionend",function fim(e){if(e.target===capa&&e.propertyName==="opacity"){capa.removeEventListener("transitionend",fim);esconder()}});
+    setTimeout(esconder,1400);
+    if(typeof window.mostrarContainer2==="function")window.mostrarContainer2();
+    else if(typeof window.__taliStartVideo==="function")window.__taliStartVideo();
+    else if(typeof window.__C2_LIGAR_VIDEO__==="function")window.__C2_LIGAR_VIDEO__();
+  }
+  function iniciarTimer(){if(timerIniciado)return;timerIniciado=true;setTimeout(disparar,TIMER_MS)}
+  function esconderHint(){if(hintEscondido||!hint)return;hintEscondido=true;hint.style.opacity="0";setTimeout(function(){hint.style.display="none"},600)}
+  function primeiroToque(){if(typeof window.__MUSICA_TOCAR__==="function"){try{window.__MUSICA_TOCAR__()}catch(_){}}preIniciarVideo();esconderHint();iniciarTimer()}
+  canvas.addEventListener("mouseenter",function(){if(floco)floco.style.display="flex"});
+  canvas.addEventListener("mouseleave",function(){if(floco)floco.style.display="none";desenhando=false});
+  canvas.addEventListener("mousemove",function(e){moverFloco(e.clientX,e.clientY);if(!desenhando||disparado)return;esconderTexto();var p=toCanvas(e.clientX,e.clientY);rasparLinha(ultimoX,ultimoY,p.x,p.y);ultimoX=p.x;ultimoY=p.y});
+  canvas.addEventListener("mousedown",function(e){if(!peliculaOk||disparado)return;e.preventDefault();desenhando=true;var p=toCanvas(e.clientX,e.clientY);ultimoX=p.x;ultimoY=p.y;rasparPonto(p.x,p.y);primeiroToque();moverFloco(e.clientX,e.clientY)});
+  window.addEventListener("mouseup",function(){desenhando=false;soltarBorr();preIniciarVideo()});
+  window.addEventListener("click",preIniciarVideo,true);window.addEventListener("pointerup",preIniciarVideo,true);
+  canvas.addEventListener("touchstart",function(e){e.preventDefault();var t=e.touches[0];moverFloco(t.clientX,t.clientY);if(floco)floco.style.display="flex";if(!peliculaOk||disparado)return;desenhando=true;var p=toCanvas(t.clientX,t.clientY);ultimoX=p.x;ultimoY=p.y;rasparPonto(p.x,p.y);primeiroToque()},{passive:false});
+  canvas.addEventListener("touchmove",function(e){if(!desenhando||disparado)return;e.preventDefault();esconderTexto();var t=e.touches[0],p=toCanvas(t.clientX,t.clientY);rasparLinha(ultimoX,ultimoY,p.x,p.y);ultimoX=p.x;ultimoY=p.y;moverFloco(t.clientX,t.clientY)},{passive:false});
+  window.addEventListener("touchend",function(){desenhando=false;soltarBorr();preIniciarVideo();if(floco)floco.style.display="none"});
+})();
+</script>
+<!-- ========= CONTAINER 2: VÍDEO + BOTÕES ========= -->
+<div id="c2-wrapper">
+<style>
+  html{ padding:0; background:#000!important; color-scheme:light; }
+  body{ margin:0!important; padding:0!important; background:#000!important; overflow-x:hidden!important; }
+  #c2-wrapper, #c2-wrapper *{ margin:0!important; padding:0!important; box-sizing:border-box!important; }
+
+  #container2-video{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    z-index:1;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .6s ease;
+  }
+  #container2-video.ativo{ opacity:1; pointer-events:auto; }
+  @supports(height:100svh){ #container2-video{height:100svh} }
+  @supports(height:100dvh){ #container2-video{height:100dvh} }
+
+  #c2canvas{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:100vw;
+    height:calc(100vw * 1920 / 1080);
+  }
+  @media (max-aspect-ratio:1080/1920){
+    #c2canvas{ width:calc(100vh * 1080 / 1920); height:100vh; }
+    @supports(height:100svh){ #c2canvas{ width:calc(100svh * 1080 / 1920); height:100svh; } }
+    @supports(height:100dvh){ #c2canvas{ width:calc(100dvh * 1080 / 1920); height:100dvh; } }
+  }
+  @media (min-aspect-ratio:1080/1920){
+    #c2canvas{ width:100vw; height:calc(100vw * 1920 / 1080); }
+  }
+
+  #video2{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    background:#000;
+    pointer-events:none;
+  }
+
+  #botoesConvite{
+    position:absolute;
+    inset:0;
+    z-index:50;
+    pointer-events:none;   /* liberado quando o vídeo termina */
+  }
+  .btnArea{
+    position:absolute;
+    border-radius:20px;
+    background:transparent!important;
+    display:block;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  #btn1{ left:46%; top:59.9%; width:19.8%; height:15.5%; }
+  #btn2{ left:69.8%; top:60.5%; width:20.6%; height:14.9%; }
+  #btn3{ left:45.7%; top:76.5%; width:20.5%; height:15.4%; }
+  #btn4{ left:70.2%; top:76.8%; width:20.5%; height:15.1%; }
+
+  #playFallback{
+    display:none;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(0,0,0,.75);
+    color:#fff;
+    border:1px solid rgba(255,255,255,.5);
+    border-radius:999px;
+    padding:14px 26px!important;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    z-index:150000;
+  }
+
+  .overlayConvite{position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:100vw!important;min-width:100vw!important;max-width:100vw!important;height:100vh!important;min-height:100vh!important;max-height:100vh!important;margin:0!important;padding:0!important;box-sizing:border-box!important;display:none;justify-content:center;align-items:center;flex-direction:column;overflow:hidden;background:rgba(12,12,12,.30);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:100000}
+  @supports(height:100svh){.overlayConvite{height:100svh!important;min-height:100svh!important;max-height:100svh!important}}
+  @supports(height:100dvh){.overlayConvite{height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important}}
+  .overlayConvite img{position:absolute;top:0;right:0;bottom:0;left:0;display:block!important;width:100vw!important;min-width:100vw!important;height:100%!important;min-height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center center!important;-webkit-user-drag:none;user-select:none;touch-action:manipulation}
+  .fecharOverlay{position:absolute;top:calc(env(safe-area-inset-top,0px) + 18px);right:calc(env(safe-area-inset-right,0px) + 18px);width:56px;height:56px;background:linear-gradient(180deg,rgba(255,255,255,.48) 0%,rgba(248,248,248,.43) 52%,rgba(238,238,238,.38) 100%);color:#000;border:1px solid rgba(255,255,255,.34);border-radius:16px;font-size:31px;line-height:1;font-weight:300;cursor:pointer;z-index:100001;display:flex;justify-content:center;align-items:center;box-shadow:0 14px 30px rgba(0,0,0,.18),0 4px 12px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.56),inset 0 -6px 14px rgba(0,0,0,.04);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);-webkit-tap-highlight-color:transparent;letter-spacing:-0.05em;transition:transform .24s ease,box-shadow .24s ease,background .24s ease,filter .24s ease}
+  .fecharOverlay:hover{transform:translateY(-1px) scale(1.03);box-shadow:0 18px 36px rgba(0,0,0,.22),0 6px 14px rgba(0,0,0,.10),inset 0 1px 0 rgba(255,255,255,.64),inset 0 -6px 14px rgba(0,0,0,.04);filter:saturate(1.02);background:linear-gradient(180deg,rgba(255,255,255,.54),rgba(248,248,248,.48),rgba(238,238,238,.42))}
+  .fecharOverlay:active{transform:translateY(0) scale(.97)}
+  @media (max-width:640px){
+    .fecharOverlay{top:calc(env(safe-area-inset-top,0px) + 14px);right:calc(env(safe-area-inset-right,0px) + 14px);width:52px;height:52px;font-size:28px;border-radius:14px}
+  }
+
+  #toastPix{
+    display:none;
+    position:fixed;
+    bottom:7%;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.78);
+    padding:10px 16px!important;
+    color:#fff;
+    font-weight:600;
+    border-radius:10px;
+    z-index:200000;
+  }
+
+  #estadoMidia[hidden]{display:none!important}
+  #estadoMidia{position:fixed;left:50%;bottom:8%;transform:translateX(-50%);z-index:170000;width:min(90vw,420px);padding:12px 18px!important;border-radius:14px;color:#fff;background:rgba(0,0,0,.85);text-align:center;font:14px/1.45 system-ui,sans-serif;pointer-events:none}
+  #container2-video{transition:opacity 1.2s ease-in-out}
+  #playFallback{top:auto!important;bottom:12%!important;transform:translateX(-50%)!important}
+  body:not(.rasp-fim) #playFallback,body:not(.rasp-fim) #estadoMidia{display:none!important}
+</style>
+
+<div id="container2-video">
+  <div id="c2canvas">
+    <video id="video2" poster="assets/imagem-fundo-1-Convite-Salvar-Colagem-criada-por-taciana-ml-5-.png" playsinline webkit-playsinline preload="auto">
+      <source src="assets/video-1-Convite-Salvar-Colagem-criada-por-taciana-ml-1-.mp4" type="video/mp4">
+    </video>
+    <div id="botoesConvite" aria-hidden="true">
+      <a class="btnArea" id="btn1" href="https://maps.app.goo.gl/DyHoKneQ7Kp2qmNJ6" target="_blank" rel="noopener noreferrer" aria-label="Botão"></a>
+      <a class="btnArea" id="btn2" href="https://api.whatsapp.com/send/?phone=447725952284&amp;text=Ol%C3%A1%21+Gostaria+de+confirmar+minha+presen%C3%A7a+no+anivers%C3%A1rio+da+Eloah.+%EF%BF%BD&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener noreferrer" aria-label="Botão 2"></a>
+      <a class="btnArea" id="btn3" href="#" data-overlay="#overlayBtn3" aria-label="Botão 3"></a>
+      <a class="btnArea" id="btn4" href="https://kbconviteriamoldura.com.br/filtro-eloah-6anos/" target="_blank" rel="noopener noreferrer" aria-label="Botão 4"></a>
+    </div>
+  </div>
+</div>
+
+<button id="playFallback" type="button">Toque para reproduzir com som</button>
+<div id="estadoMidia" role="status" aria-live="polite" hidden></div>
+
+<div id="overlayBtn3" class="overlayConvite" role="dialog" aria-label="Botão 3"><button type="button" class="fecharOverlay" data-close="#overlayBtn3" aria-label="Fechar">×</button><img src="assets/botao3-1-Convite-Salvar-Colagem-criada-por-taciana-ml-6-.png" alt="Botão 3"></div>
+
+<div id="toastPix">✨ Chave Pix copiada!</div>
+
+<script>
+(function(){
+  var hide=function(){
+    ['[class*="cookie"]','[id*="cookie"]','[class*="gdpr"]','[id*="gdpr"]',
+     '[class*="consent"]','[id*="consent"]','[class*="privacy"]','[id*="privacy"]']
+    .forEach(function(s){
+      document.querySelectorAll(s).forEach(function(el){ el.style.display='none'; });
+    });
+  };
+  hide(); setTimeout(hide,600); setTimeout(hide,1800);
+
+  var cont=document.getElementById('container2-video');
+  var video=document.getElementById('video2');
+  var botoes=document.getElementById('botoesConvite');
+  var fallback=document.getElementById('playFallback');
+  var PREFIXO=0;
+  var FIM_CONTEUDO=4;
+  var status=document.getElementById('estadoMidia');
+  var liberado=false, watcher=null, abriu=false, jaTocou=false, querTocar=false, pausouEmFundo=false, tentativa=0, frame=0, timerCarregamento=0;
+  if(video){ video.muted=false; video.defaultMuted=false; video.removeAttribute('muted'); video.loop=false; }
+
+  function mensagem(t){ if(!status) return; status.textContent=t||''; status.hidden=!t; }
+  function mostrarRetomar(t){ if(fallback){ fallback.textContent=t||'Toque para reproduzir com som'; fallback.style.display='block'; } }
+  function esconderRetomar(){ if(fallback) fallback.style.display='none'; }
+  function limparAvisoCarregamento(){ clearTimeout(timerCarregamento); timerCarregamento=0; }
+  function avisarCarregamento(){
+    /* Sem aviso rotineiro de carregamento (igual à referência): após 10 s de
+       dificuldade real, apenas o botão de nova tentativa. Erros reais continuam
+       mostrando mensagem no estadoMidia. */
+    limparAvisoCarregamento();
+    timerCarregamento=setTimeout(function(){
+      if(querTocar&&!document.hidden&&(video.paused||video.readyState<3)){ mostrarRetomar('Tentar reproduzir com som'); }
+    },10000);
+  }
+  function revelarVideo(){
+    if(abriu) return; abriu=true;
+    if(cont) cont.classList.add('ativo');
+    try{ window.dispatchEvent(new CustomEvent('talicodex:video-conteudo')); }catch(_){}
+  }
+  function liberarBotoes(){
+    if(liberado) return;
+    liberado=true;
+    if(botoes){
+      botoes.style.pointerEvents='auto';
+      botoes.removeAttribute('aria-hidden');
+      botoes.querySelectorAll('a,button').forEach(function(el){ el.removeAttribute('tabindex'); });
+    }
+  }
+  function travarFim(){
+    if(!video) return;
+    try{
+      video.pause();
+      if(isFinite(video.duration)&&video.duration>0){
+        video.currentTime=Math.max(0,video.duration-0.05);
+      }
+    }catch(e){}
+    if(watcher){ clearInterval(watcher); watcher=null; }
+    liberarBotoes();
+  }
+  function acompanharTempo(){
+    if(!jaTocou) return;
+    if(video.currentTime>=PREFIXO) revelarVideo();
+    if(FIM_CONTEUDO!==null&&video.currentTime>=FIM_CONTEUDO) liberarBotoes();
+  }
+  function acompanharFrame(){
+    acompanharTempo();
+    if(!video.paused&&!video.ended) frame=requestAnimationFrame(acompanharFrame); else frame=0;
+  }
+  function iniciarFrames(){ if(!frame) frame=requestAnimationFrame(acompanharFrame); }
+
+  function reproduzir(){
+    /* play() imediato, dentro do gesto: sem await, fetch ou temporizador antes. */
+    if(!video||document.hidden) return;
+    querTocar=true; pausouEmFundo=false;
+    if(video.error) video.load();
+    if(video.ended) return;
+    video.muted=false;
+    var id=++tentativa;
+    avisarCarregamento();
+    var promise;
+    try{ promise=video.play(); }catch(erro){ tratarErro(erro,id); return; }
+    if(promise&&typeof promise.then==='function'){
+      promise.then(function(){
+        if(id!==tentativa) return;
+        jaTocou=true; limparAvisoCarregamento(); esconderRetomar(); mensagem(''); acompanharTempo(); iniciarFrames();
+      }).catch(function(erro){ tratarErro(erro,id); });
+    }
+  }
+  function tratarErro(erro,id){
+    if(id!==tentativa||document.hidden) return;
+    limparAvisoCarregamento();
+    if(erro&&erro.name==='AbortError'){ mostrarRetomar('Toque para retomar o convite'); return; }
+    mostrarRetomar('Toque para reproduzir com som');
+    if(erro&&erro.name==='NotAllowedError') mensagem('O navegador pede um toque para autorizar o som.');
+    else mensagem('Não foi possível iniciar. Toque para tentar novamente.');
+  }
+  window.__C2_TOCAR__=reproduzir;
+  window.__C2_LIGAR_VIDEO__=reproduzir;
+  window.__C2_LIBERAR__=liberarBotoes;
+  window.__C2_RETOMAR__=function(){ mostrarRetomar('Toque para retomar o convite'); };
+
+  if(video){
+    video.addEventListener('playing',function(){ jaTocou=true; limparAvisoCarregamento(); esconderRetomar(); mensagem(''); acompanharTempo(); iniciarFrames(); });
+    video.addEventListener('timeupdate',acompanharTempo);
+    video.addEventListener('waiting',function(){ if(querTocar) avisarCarregamento(); });
+    video.addEventListener('stalled',function(){ if(querTocar) avisarCarregamento(); });
+    video.addEventListener('error',function(){ limparAvisoCarregamento(); mensagem('Não foi possível carregar o vídeo. Verifique a conexão ou recarregue a página.'); mostrarRetomar('Tentar carregar novamente'); });
+    video.addEventListener('pause',function(){
+      cancelAnimationFrame(frame); frame=0;
+      if(querTocar&&!document.hidden&&!video.ended&&!pausouEmFundo&&!liberadoFinal()) mostrarRetomar('Toque para retomar o convite');
+    });
+    video.addEventListener('ended',function(){
+      acompanharTempo();
+      travarFim();
+    });
+  }
+  function liberadoFinal(){ return liberado&&isFinite(video.duration)&&video.currentTime>=video.duration-0.2; }
+
+  if(fallback) fallback.addEventListener('click',function(){ reproduzir(); });
+
+  document.addEventListener('visibilitychange',function(){
+    if(!video) return;
+    if(document.hidden){ pausouEmFundo=querTocar&&!video.paused; ++tentativa; limparAvisoCarregamento(); video.pause(); }
+    else if(querTocar&&video.paused&&!liberadoFinal()){ pausouEmFundo=false; mostrarRetomar('Toque para retomar o convite'); mensagem(''); }
+  });
+  window.addEventListener('pagehide',function(){ if(!video) return; ++tentativa; limparAvisoCarregamento(); video.pause(); });
+  window.addEventListener('pageshow',function(e){ if(e.persisted&&querTocar&&video&&video.paused&&!liberadoFinal()) mostrarRetomar('Toque para retomar o convite'); });
+
+function openOv(sel){
+  const el=document.querySelector(sel);
+  if(!el) return;
+  el.style.display='flex';
+  el.style.width='100vw';
+  el.style.maxWidth='100vw';
+  el.style.height='100dvh';
+  el.style.maxHeight='100dvh';
+  document.documentElement.style.overflow='hidden';
+  document.body.style.overflow='hidden';
+}
+function closeOv(sel){
+  const el=document.querySelector(sel);
+  if(!el) return;
+  el.style.display='none';
+  document.documentElement.style.overflow='';
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape') return;
+  document.querySelectorAll('.overlayConvite').forEach(function(el){
+    if(el.style.display==='flex') closeOv('#'+el.id);
+  });
+});
+
+
+  document.addEventListener('click',function(e){
+    var closeBtn=e.target.closest('[data-close]');
+    if(closeBtn){ e.preventDefault(); closeOv(closeBtn.getAttribute('data-close')); return; }
+    var area=e.target.closest('.btnArea');
+    if(!area) return;
+    if(!liberado){ e.preventDefault(); return; }
+    var ov=area.getAttribute('data-overlay');
+    if(ov){ e.preventDefault(); openOv(ov); }
+  }, true);
+
+  document.addEventListener('click', async function(e){
+    var pixImg=e.target.closest('[data-pix-copy]');
+    if(!pixImg) return;
+    var overlay=pixImg.closest('.overlayConvite[data-pix-key]');
+    if(!overlay) return;
+    var chave=overlay.getAttribute('data-pix-key');
+    if(!chave) return;
+    try{
+      await navigator.clipboard.writeText(chave);
+    }catch(err){
+      var t=document.createElement('textarea');
+      t.value=chave;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand('copy');
+      document.body.removeChild(t);
+    }
+    var toastEl=document.getElementById('toastPix');
+    if(toastEl){
+      toastEl.style.display='block';
+      setTimeout(function(){ toastEl.style.display='none'; },1600);
+    }
+  });
+
+  document.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+  document.addEventListener('dragstart',function(e){ e.preventDefault(); });
+})();
+</script>
+</div>
+<script>
+/* ===== INTEGRAÇÃO COM CONTAINER 1 (raspadinha) =====
+   O vídeo NÃO toca durante a raspagem: o que aparece pelos furos da película é a capa.
+   No 1º toque o vídeo é pré-ligado dentro do gesto (autoriza o som) e volta ao 0.
+   Quando a película some, a capa faz um fade suave e só então o vídeo começa. */
+(function(){
+  var wrap=document.getElementById('container2-video'),video=document.getElementById('video2');
+  if(!wrap||!video)return;
+  var ligado=false,preparado=false,preparando=null,revelado=false,quadroPendente=false,tentandoSom=false;
+
+  /* Pré-ligação no gesto: toca um instante para autorizar o som e volta ao início, pausado. */
+  window.__C2_PREPARAR_VIDEO__=function(){
+    if(ligado||preparado||preparando)return;
+    video.muted=false;
+    try{
+      preparando=Promise.resolve(video.play());
+      preparando.then(function(){preparado=true;if(!ligado){video.pause();video.currentTime=0}}).catch(function(){}).finally(function(){preparando=null});
+    }catch(e){preparando=null}
+  };
+
+  function iniciarFade(){
+    if(revelado||!ligado||video.paused||video.readyState<2)return;
+    revelado=true;
+    wrap.classList.add('ativo');wrap.style.opacity='1';wrap.style.pointerEvents='auto';
+    document.body.classList.add('rasp-fim');
+    window.__talicodexIntroStarted=true;window.dispatchEvent(new Event('talicodex:intro-started'));
+  }
+  function esperarPrimeiroQuadro(){
+    if(!ligado||revelado||quadroPendente||video.paused)return;
+    quadroPendente=true;
+    if(typeof video.requestVideoFrameCallback==='function'){
+      video.requestVideoFrameCallback(function(){quadroPendente=false;iniciarFade()});
+    }else{
+      requestAnimationFrame(function(){requestAnimationFrame(function(){quadroPendente=false;iniciarFade()})});
+    }
+  }
+  if(video){video.addEventListener('playing',esperarPrimeiroQuadro);video.addEventListener('loadeddata',esperarPrimeiroQuadro)}
+
+  /* Chamado pelo Container 1 quando a película sumiu: o vídeo começa do início, com som. */
+  window.__C2_LIGAR_VIDEO__=function(){
+    if(ligado)return;ligado=true;
+    try{
+      video.muted=false;video.currentTime=0;
+      var p=video.play();
+      if(p&&p.catch)p.catch(function(){video.muted=true;var q=video.play();if(q&&q.catch)q.catch(function(){})});
+    }catch(e){video.muted=true;try{video.play()}catch(_){}}
+    esperarPrimeiroQuadro();
+    /* Nunca fica preso: sem o vídeo rodar, os botões liberam 3,5 s depois. */
+    setTimeout(function(){if(!revelado&&typeof window.__C2_LIBERAR__==='function')window.__C2_LIBERAR__()},3500);
+  };
+  window.mostrarContainer2=window.__C2_LIGAR_VIDEO__;
+  window.__taliStartVideo=window.__C2_LIGAR_VIDEO__;
+
+  /* Um próximo gesto devolve o som se o celular tiver bloqueado na pré-ligação. */
+  function tentarSom(){
+    if(tentandoSom||!ligado||video.ended||!video.muted)return;
+    tentandoSom=true;video.muted=false;
+    Promise.resolve(video.play()).catch(function(){video.muted=true;return video.play()}).catch(function(){}).finally(function(){tentandoSom=false});
+  }
+  ['touchend','pointerup','click'].forEach(function(t){document.addEventListener(t,tentarSom,true)});
+})();
+</script>
+<!-- ========= MÚSICA DE FUNDO ========= -->
+<audio id="musicaFundo" src="assets/musica-1793777931613.trimmed.mp3" preload="auto" loop playsinline></audio>
+<script>
+(function(){
+  var musica=document.getElementById('musicaFundo');
+  if(!musica) return;
+  var VOLUME=0.4, quer=false, fade=0;
+  function subir(){
+    clearInterval(fade); musica.volume=0;
+    fade=setInterval(function(){ musica.volume=Math.min(VOLUME,musica.volume+0.05); if(musica.volume>=VOLUME) clearInterval(fade); },80);
+  }
+  var pedida=false;
+  function tocar(){
+    pedida=true;
+    if(document.hidden) return;
+    var p; try{ p=musica.play(); }catch(_){ return; }
+    if(p&&p.then) p.then(function(){ if(!quer){ quer=true; subir(); } }).catch(function(){});
+    else quer=true;
+  }
+  window.__MUSICA_TOCAR__=tocar;
+  /* Se o celular bloquear o 1º play, qualquer toque seguinte liga a música */
+  ['touchend','pointerup','click'].forEach(function(t){
+    document.addEventListener(t,function(){ if(pedida&&musica.paused&&!document.hidden) tocar(); },true);
+  });
+  /* Pausa quando sai do app e volta a tocar ao retornar */
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){ musica.pause(); }
+    else if(pedida){ tocar(); }
+  });
+  window.addEventListener('pagehide',function(){ musica.pause(); });
+})();
+</script>
+
+<!-- ========= AGENDA ========= -->
+<style>
+  #agendaMenu{display:none;position:fixed;inset:0;z-index:210000;align-items:flex-end;justify-content:center;font-family:Arial,sans-serif}
+  #agendaMenu .am-fundo{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+  #agendaMenu .am-caixa{position:relative;width:min(92vw,420px);margin:0 0 calc(env(safe-area-inset-bottom,0px) + 16px);background:#fff;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+  #agendaMenu p{margin:0 0 4px;text-align:center;font-weight:700;font-size:15px;color:#222}
+  #agendaMenu button{border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;background:#f1ece6;color:#222}
+  #agendaMenu button[data-am="x"]{background:transparent;color:#666;font-weight:500}
+</style>
+<script>
+(function(){
+  var EVENTO={"titulo":"kbconviteria","inicio":"2026-11-14T00:00","fim":"2026-11-14T00:00","diaInteiro":true,"local":"","descricao":"","lembretes":[],"uid":"fede196c-202611140000@savethedate","arquivo":"kbconviteria.ics"};
+  var MODO="auto";
+  var ua=navigator.userAgent||"";
+  var ehIOS=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  var ehAndroid=/Android/.test(ua);
+  var enc=encodeURIComponent;
+  function p2(n){return (n<10?"0":"")+n}
+  function dia(s){return s.slice(0,10).replace(/-/g,"")}
+  function diaSeguinte(s){var d=new Date(Date.UTC(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10)+1));return d.getUTCFullYear()+p2(d.getUTCMonth()+1)+p2(d.getUTCDate())}
+  function hora(s){return s.replace(/[-:]/g,"")+"00"}
+  function datas(){
+    if(EVENTO.diaInteiro) return dia(EVENTO.inicio)+"/"+diaSeguinte(EVENTO.fim);
+    return hora(EVENTO.inicio)+"/"+hora(EVENTO.fim);
+  }
+
+  /* Android / computador: abre o Google Agenda já preenchido (o link do Google não aceita lembretes) */
+  function abrirGoogle(){
+    window.open("https://calendar.google.com/calendar/render?action=TEMPLATE"
+      +"&text="+enc(EVENTO.titulo)
+      +"&dates="+datas()
+      +(EVENTO.descricao?"&details="+enc(EVENTO.descricao):"")
+      +(EVENTO.local?"&location="+enc(EVENTO.local):""),"_blank");
+  }
+
+  /* iPhone / Mac / Outlook: arquivo .ics (calendário nativo), com lembretes */
+  function esc(t){return String(t).replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\;").replace(/\r?\n/g,"\\n")}
+  function dobrar(l){var o=[];while(l.length>60){o.push(l.slice(0,60));l=" "+l.slice(60)}o.push(l);return o.join("\r\n")}
+  function baixarIcs(){
+    var agora=new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z";
+    var l=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Save the Date//PT","CALSCALE:GREGORIAN","BEGIN:VEVENT","UID:"+EVENTO.uid,"DTSTAMP:"+agora];
+    if(EVENTO.diaInteiro){ l.push("DTSTART;VALUE=DATE:"+dia(EVENTO.inicio),"DTEND;VALUE=DATE:"+diaSeguinte(EVENTO.fim)); }
+    else { l.push("DTSTART:"+hora(EVENTO.inicio),"DTEND:"+hora(EVENTO.fim)); }
+    l.push("SUMMARY:"+esc(EVENTO.titulo));
+    if(EVENTO.descricao) l.push("DESCRIPTION:"+esc(EVENTO.descricao));
+    if(EVENTO.local) l.push("LOCATION:"+esc(EVENTO.local));
+    (EVENTO.lembretes||[]).forEach(function(m){
+      l.push("BEGIN:VALARM","TRIGGER:"+(m>0?"-PT"+m+"M":"PT0S"),"ACTION:DISPLAY","DESCRIPTION:"+esc(EVENTO.titulo),"END:VALARM");
+    });
+    l.push("END:VEVENT","END:VCALENDAR");
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([l.map(dobrar).join("\r\n")],{type:"text/calendar;charset=utf-8"}));
+    a.download=EVENTO.arquivo;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  }
+
+  function fechar(){ var m=document.getElementById("agendaMenu"); if(m) m.style.display="none"; }
+  function perguntar(){
+    var m=document.getElementById("agendaMenu");
+    if(!m){
+      m=document.createElement("div"); m.id="agendaMenu";
+      m.innerHTML='<div class="am-fundo"></div><div class="am-caixa" role="dialog" aria-label="Adicionar ao calendário"><p>Adicionar ao calendário</p><button type="button" data-am="google">Google Agenda</button><button type="button" data-am="ics">Apple / Outlook (arquivo)</button><button type="button" data-am="x">Cancelar</button></div>';
+      document.body.appendChild(m);
+      m.addEventListener("click",function(e){
+        var b=e.target.closest("[data-am]");
+        if(b){ var a=b.getAttribute("data-am"); fechar(); if(a==="google") abrirGoogle(); else if(a==="ics") baixarIcs(); }
+        else if(e.target.classList.contains("am-fundo")) fechar();
+      });
+    }
+    m.style.display="flex";
+  }
+
+  document.addEventListener("click",function(e){
+    if(!e.target.closest("[data-agenda]")) return;
+    e.preventDefault();
+    if(MODO==="menu") perguntar();
+    else if(ehIOS) baixarIcs();
+    else if(ehAndroid) abrirGoogle();
+    else perguntar();
+  });
+})();
+</script>
+<!-- COR DE FUNDO DA PÁGINA -->
+<style>
+html, body, #backgroundFix, #container2-video, #container2-wrap, #video, #infinito, #stageInfinito, #rasp-capa, #rasp-stage, #capa{ background:#ffffff!important; }
+html{ color-scheme:light!important; }
+</style>
+<script>
+(function(){
+  var h=document.head||document.getElementsByTagName('head')[0]; if(!h) return;
+  function meta(n,c){ var ms=h.querySelectorAll('meta[name="'+n+'"]'); if(!ms.length){ var m=document.createElement('meta'); m.setAttribute('name',n); h.appendChild(m); ms=[m]; } for(var i=0;i<ms.length;i++){ ms[i].setAttribute('content',c); ms[i].removeAttribute('media'); } }
+  meta('theme-color',"#ffffff");
+  meta('color-scheme',"light");
+})();
+</script>
+</body>
+</html>
+
+Publique o conteúdo deste ZIP na Netlify. Para trocar a capa, substitua o arquivo correspondente na pasta assets, mantendo o mesmo nome. Republique a pasta completa no mesmo site. Para outras alterações, gere um novo ZIP neste formulário.
